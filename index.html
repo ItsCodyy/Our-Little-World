@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A Little World Called Us</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Dancing+Script:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+                        script: ['"Dancing Script"', 'cursive'],
+                        sans: ['"Inter"', 'sans-serif'],
+                    },
+                    colors: {
+                        night: '#0a0f1d',
+                        nightCard: '#0b101d',
+                        cream: '#faf6f0',
+                        creamDark: '#f4ebe1',
+                        gold: '#d9a441',
+                        terracotta: '#c86d5c',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #faf6f0;
+            color: #2c2520;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Starry Sky & Shooting Stars */
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle var(--duration, 4s) ease-in-out infinite;
+            animation-delay: var(--delay, 0s);
+            opacity: var(--opacity, 0.6);
+        }
+
+        @keyframes twinkle {
+
+            0%,
+            100% {
+                opacity: var(--opacity, 0.6);
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.15;
+                transform: scale(0.75);
+            }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 90px;
+            height: 1.5px;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.85), transparent);
+            transform: rotate(-35deg);
+            opacity: 0;
+            animation: shoot 7s ease-in-out infinite;
+            animation-delay: var(--delay, 2s);
+        }
+
+        @keyframes shoot {
+            0% {
+                transform: translate(0, 0) rotate(-35deg);
+                opacity: 0;
+            }
+
+            5% {
+                opacity: 0.9;
+            }
+
+            18% {
+                transform: translate(-220px, 150px) rotate(-35deg);
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* Secret Golden Star */
+        .secret-star-btn {
+            position: absolute;
+            top: 36%;
+            right: 22%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .secret-star-btn:hover {
+            transform: scale(1.35) rotate(12deg);
+        }
+
+        .secret-star-glow {
+            position: absolute;
+            inset: -6px;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(217, 164, 65, 0.55) 0%, rgba(217, 164, 65, 0) 70%);
+            animation: pulseGlow 2.4s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+
+            50% {
+                transform: scale(1.35);
+                opacity: 1;
+            }
+        }
+
+        /* Inline Memory Smooth Expand */
+        .memory-body {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+            opacity: 0;
+        }
+
+        .memory-body.open {
+            grid-template-rows: 1fr;
+            opacity: 1;
+        }
+
+        .memory-body>div {
+            overflow: hidden;
+        }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1), transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Modal Transitions */
+        .modal-backdrop {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-panel {
+            transform: scale(0.94) translateY(10px);
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .modal-backdrop.active .modal-panel {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Polaroid Hover */
+        .polaroid {
+            background: #ffffff;
+            padding: 12px 12px 34px 12px;
+            box-shadow: 0 12px 30px rgba(20, 16, 12, 0.08);
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease;
+        }
+
+        .polaroid:hover {
+            transform: translateY(-4px) rotate(0deg) !important;
+            box-shadow: 0 18px 40px rgba(20, 16, 12, 0.13);
+        }
+
+        /* Envelope Flap */
+        .envelope-card {
+            background: linear-gradient(180deg, #f6e5d6 0%, #edd5c2 100%);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+        }
+
+        .envelope-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 32px rgba(120, 80, 50, 0.12);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 58%;
+            background: linear-gradient(180deg, #f9ece0 0%, #f1dcc9 100%);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-gold/25 selection:text-night">
+
+    <!-- Right-side Section Dots -->
+    <nav id="sideNav" class="fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col gap-3">
+        <a href="#hero" class="nav-dot w-2 h-2 rounded-full bg-gold/40 hover:bg-gold transition-all"
+            aria-label="Hero"></a>
+        <a href="#journey" class="nav-dot w-2 h-2 rounded-full bg-gold/40 hover:bg-gold transition-all"
+            aria-label="Our Journey"></a>
+        <a href="#letters" class="nav-dot w-2 h-2 rounded-full bg-gold/40 hover:bg-gold transition-all"
+            aria-label="Love Letters"></a>
+        <a href="#gallery" class="nav-dot w-2 h-2 rounded-full bg-gold/40 hover:bg-gold transition-all"
+            aria-label="Our Gallery"></a>
+        <a href="#reasons" class="nav-dot w-2 h-2 rounded-full bg-gold/40 hover:bg-gold transition-all"
+            aria-label="16 Reasons"></a>
+        <a href="#future" class="nav-dot w-2 h-2 rounded-full bg-gold/40 hover:bg-gold transition-all"
+            aria-label="Our Future"></a>
+    </nav>
+
+    <!-- Floating Ambient Audio Player -->
+    <div
+        class="fixed bottom-5 left-5 z-40 flex items-center gap-3 bg-[#151b2b]/90 backdrop-blur-md text-white/90 px-3.5 py-2 rounded-full shadow-xl border border-white/10">
+        <button id="audioToggle"
+            class="w-7 h-7 rounded-full bg-gold text-night flex items-center justify-center hover:scale-105 transition-transform"
+            aria-label="Toggle Music">
+            <svg id="playIcon" class="w-3.5 h-3.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+            </svg>
+            <svg id="pauseIcon" class="w-3.5 h-3.5 hidden" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+            </svg>
+        </button>
+        <div class="flex flex-col pr-1">
+            <span class="text-[10px] tracking-[0.18em] uppercase text-white/60">Ambient</span>
+            <span id="audioLabel" class="text-[11px] font-medium text-white/90">Our Little Sky</span>
+        </div>
+    </div>
+
+    <!-- 1. HERO SECTION -->
+    <section id="hero"
+        class="relative min-h-screen bg-night text-white flex flex-col items-center justify-center px-6 overflow-hidden">
+        <div id="heroStarfield" class="absolute inset-0 pointer-events-none"></div>
+
+        <!-- Glowing Moon -->
+        <div
+            class="absolute top-14 right-12 md:top-20 md:right-24 w-16 h-16 md:w-20 md:h-20 rounded-full bg-[#fdfbf7] shadow-[0_0_50px_rgba(253,251,247,0.55)] opacity-90">
+        </div>
+
+        <div class="relative z-10 text-center max-w-2xl mx-auto">
+            <p class="text-[10px] md:text-xs tracking-[0.3em] uppercase text-white/50 mb-4">Kan & Me · Est. 05 July 2025
+            </p>
+            <h1 class="font-serif text-5xl md:text-7xl font-normal tracking-tight leading-[1.08] mb-3">
+                A Little World<br /><span class="italic">Called Us</span>
+            </h1>
+            <p class="font-script text-xl md:text-2xl text-white/75 mb-10">
+                A little place where all my favorite memories live.
+            </p>
+
+            <!-- Live Countdown Pill -->
+            <div
+                class="inline-flex flex-wrap items-center justify-center gap-4 md:gap-7 bg-white/[0.05] backdrop-blur-md border border-white/10 rounded-2xl px-6 py-4 mb-4">
+                <div class="text-center">
+                    <div id="cd-years" class="font-serif text-2xl md:text-3xl text-white">0</div>
+                    <div class="text-[9px] tracking-[0.2em] uppercase text-white/45 mt-0.5">Years</div>
+                </div>
+                <div class="text-center">
+                    <div id="cd-months" class="font-serif text-2xl md:text-3xl text-white">0</div>
+                    <div class="text-[9px] tracking-[0.2em] uppercase text-white/45 mt-0.5">Months</div>
+                </div>
+                <div class="text-center">
+                    <div id="cd-days" class="font-serif text-2xl md:text-3xl text-white">0</div>
+                    <div class="text-[9px] tracking-[0.2em] uppercase text-white/45 mt-0.5">Days</div>
+                </div>
+                <div class="text-center">
+                    <div id="cd-hours" class="font-serif text-2xl md:text-3xl text-white">00</div>
+                    <div class="text-[9px] tracking-[0.2em] uppercase text-white/45 mt-0.5">Hours</div>
+                </div>
+                <div class="text-center">
+                    <div id="cd-mins" class="font-serif text-2xl md:text-3xl text-white">00</div>
+                    <div class="text-[9px] tracking-[0.2em] uppercase text-white/45 mt-0.5">Minutes</div>
+                </div>
+                <div class="text-center">
+                    <div id="cd-secs" class="font-serif text-2xl md:text-3xl text-gold">00</div>
+                    <div class="text-[9px] tracking-[0.2em] uppercase text-white/45 mt-0.5">Seconds</div>
+                </div>
+            </div>
+
+            <p class="text-[10px] tracking-[0.22em] uppercase text-white/40 mb-8">
+                & Counting Every Second · Since 05 July 2025
+            </p>
+
+            <a href="#journey"
+                class="inline-flex items-center gap-2 px-7 py-3 rounded-full border border-gold/50 text-gold text-[11px] tracking-[0.2em] uppercase hover:bg-gold hover:text-night transition-all duration-300">
+                Enter Our Little World ♡
+            </a>
+        </div>
+    </section>
+
+    <!-- 2. CHAPTER ONE: OUR JOURNEY -->
+    <section id="journey" class="py-24 md:py-32 px-6 max-w-5xl mx-auto">
+        <div class="text-center mb-20 reveal">
+            <div class="flex items-center justify-center gap-3 mb-3">
+                <span class="w-8 h-px bg-gold/40"></span>
+                <span class="text-[10px] tracking-[0.28em] uppercase text-gold">Chapter One</span>
+                <span class="w-8 h-px bg-gold/40"></span>
+            </div>
+            <h2 class="font-serif text-4xl md:text-5xl text-[#2c2520] mb-2">Our Journey</h2>
+            <p class="font-script text-2xl text-[#8b735b] mb-4">six days that quietly changed everything</p>
+            <p class="text-xs md:text-sm text-[#7a6d62] max-w-md mx-auto leading-relaxed">
+                Every page here is a day I did not know was important until it was already a memory.
+            </p>
+        </div>
+
+        <div id="timelineContainer" class="relative space-y-20 md:space-y-28">
+            <!-- Vertical Center Line (Desktop) -->
+            <div class="hidden md:block absolute left-1/2 top-0 bottom-0 w-px bg-gold/20 -translate-x-1/2"></div>
+        </div>
+    </section>
+
+    <!-- 3. CHAPTER TWO: LOVE LETTERS -->
+    <section id="letters" class="py-24 md:py-32 px-6 bg-[#f7f1e9]/60">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <div class="flex items-center justify-center gap-3 mb-3">
+                    <span class="w-8 h-px bg-gold/40"></span>
+                    <span class="text-[10px] tracking-[0.28em] uppercase text-gold">Chapter Two</span>
+                    <span class="w-8 h-px bg-gold/40"></span>
+                </div>
+                <h2 class="font-serif text-4xl md:text-5xl text-[#2c2520] mb-2">Love Letters</h2>
+                <p class="font-script text-2xl text-[#8b735b] mb-4">the things I could never say out loud</p>
+                <p class="text-xs md:text-sm text-[#7a6d62] max-w-md mx-auto leading-relaxed">
+                    Four envelopes. Each one is something I wanted to tell you properly, without rushing, without the
+                    world listening.
+                </p>
+            </div>
+
+            <div id="lettersGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 reveal"></div>
+
+            <p class="text-center font-script text-lg text-[#9c8977] mt-10">press an envelope to open it ♡</p>
+        </div>
+    </section>
+
+    <!-- 4. CHAPTER THREE: OUR GALLERY -->
+    <section id="gallery" class="py-24 md:py-32 px-6 max-w-5xl mx-auto">
+        <div class="text-center mb-16 reveal">
+            <div class="flex items-center justify-center gap-3 mb-3">
+                <span class="w-8 h-px bg-gold/40"></span>
+                <span class="text-[10px] tracking-[0.28em] uppercase text-gold">Chapter Three</span>
+                <span class="w-8 h-px bg-gold/40"></span>
+            </div>
+            <h2 class="font-serif text-4xl md:text-5xl text-[#2c2520] mb-2">Our Gallery</h2>
+            <p class="font-script text-2xl text-[#8b735b] mb-4">twelve photos for our whole year</p>
+            <p class="text-xs md:text-sm text-[#7a6d62] max-w-md mx-auto leading-relaxed">
+                Not the posed ones. The ones I kept looking at long after I took them.
+            </p>
+        </div>
+
+        <div id="galleryGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 reveal"></div>
+    </section>
+
+    <!-- 5. CHAPTER FOUR: 16 REASONS I LOVE YOU -->
+    <section id="reasons" class="py-24 md:py-32 px-6 max-w-4xl mx-auto">
+        <div class="text-center mb-10 reveal">
+            <div class="flex items-center justify-center gap-3 mb-3">
+                <span class="w-8 h-px bg-gold/40"></span>
+                <span class="text-[10px] tracking-[0.28em] uppercase text-gold">Chapter Four</span>
+                <span class="w-8 h-px bg-gold/40"></span>
+            </div>
+            <h2 class="font-serif text-4xl md:text-5xl text-[#2c2520] mb-2">16 Reasons I Love You</h2>
+            <p class="font-script text-2xl text-[#8b735b] mb-4">one for every month we have had</p>
+            <p class="text-xs md:text-sm text-[#7a6d62] max-w-md mx-auto leading-relaxed mb-8">
+                Tap a heart, Kan. Some of them are small, some are the whole reason I get up in the morning.
+            </p>
+
+            <!-- Progress Bar -->
+            <div class="max-w-xs mx-auto flex items-center gap-3">
+                <div class="flex-1 h-1 bg-[#e8dfd3] rounded-full overflow-hidden">
+                    <div id="reasonsProgressBar" class="h-full bg-gold transition-all duration-500 rounded-full"
+                        style="width: 0%"></div>
+                </div>
+                <span id="reasonsCounter" class="text-[11px] font-medium text-[#8b735b] tracking-wider">0 / 16</span>
+            </div>
+        </div>
+
+        <!-- Hearts Card -->
+        <div class="reveal rounded-3xl p-8 md:p-12 shadow-[0_16px_45px_rgba(60,40,20,0.06)] border border-[#eadfd2]"
+            style="background: linear-gradient(145deg, #faf6f0 0%, #f4ebe1 100%);">
+            <div id="heartsGrid" class="grid grid-cols-4 gap-y-8 gap-x-4 md:gap-x-10 place-items-center py-4"></div>
+        </div>
+    </section>
+
+    <!-- 6. THE SECRET SURPRISE -->
+    <section class="py-12 px-6 max-w-4xl mx-auto reveal">
+        <div
+            class="relative rounded-3xl bg-nightCard text-white py-20 px-6 md:px-14 text-center overflow-hidden shadow-2xl border border-white/5">
+            <div id="secretStarfield" class="absolute inset-0 pointer-events-none"></div>
+
+            <!-- Secret Golden Star -->
+            <button id="secretStarBtn" class="secret-star-btn" aria-label="Open Secret Surprise">
+                <span class="secret-star-glow"></span>
+                <svg class="w-4 h-4 text-gold relative z-10 drop-shadow-[0_0_6px_rgba(217,164,65,0.9)]"
+                    fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2l2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l7.1-1.01L12 2z" />
+                </svg>
+            </button>
+
+            <div class="relative z-10 max-w-lg mx-auto">
+                <p class="text-[9px] tracking-[0.32em] uppercase text-white/40 mb-4">The Secret Surprise</p>
+                <h3 class="font-serif text-3xl md:text-4xl leading-snug mb-4">
+                    One star in this little sky<br /><span class="italic text-white/90">is not a star.</span>
+                </h3>
+                <p class="text-xs md:text-sm text-white/55 leading-relaxed mb-8">
+                    I hid something for you here, somewhere between the others. It has been waiting since the day I
+                    built this place.
+                </p>
+                <button id="openSecretBtn"
+                    class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-white/20 text-[10px] tracking-[0.22em] uppercase text-white/80 hover:border-gold hover:text-gold transition-colors">
+                    Read It Again ♡
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. CHAPTER FIVE: OUR FUTURE -->
+    <section id="future" class="py-24 md:py-32 px-6 max-w-5xl mx-auto">
+        <div class="text-center mb-16 reveal">
+            <div class="flex items-center justify-center gap-3 mb-3">
+                <span class="w-8 h-px bg-gold/40"></span>
+                <span class="text-[10px] tracking-[0.28em] uppercase text-gold">Chapter Five</span>
+                <span class="w-8 h-px bg-gold/40"></span>
+            </div>
+            <h2 class="font-serif text-4xl md:text-5xl text-[#2c2520] mb-2">Our Future</h2>
+            <p class="font-script text-2xl text-[#8b735b] mb-4">everything we haven't done yet</p>
+            <p class="text-xs md:text-sm text-[#7a6d62] max-w-md mx-auto leading-relaxed">
+                I do not need to know exactly how it all turns out. I just need to know it is you in every version of
+                it.
+            </p>
+        </div>
+
+        <div id="futureGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10 reveal"></div>
+
+        <!-- Promise Card -->
+        <div class="reveal rounded-2xl bg-[#f7f1e9] border border-[#eadfd2] p-8 md:p-12 text-center max-w-3xl mx-auto">
+            <p class="text-[9px] tracking-[0.28em] uppercase text-gold mb-4">A Promise, Written Down</p>
+            <p class="font-script text-2xl md:text-3xl text-[#4a3f37] leading-relaxed">
+                "I promise you the unglamorous kind of forever — the kind made of grocery lists, shared chargers, and
+                'text me when you're home.' I promise to keep choosing you on the days it is easy and the days it is
+                not. And I promise that whatever we become, we become it side by side."
+            </p>
+        </div>
+    </section>
+
+    <!-- 8. FOOTER -->
+    <footer class="relative bg-night text-white py-28 px-6 text-center overflow-hidden">
+        <div id="footerStarfield" class="absolute inset-0 pointer-events-none"></div>
+        <div class="relative z-10 max-w-xl mx-auto">
+            <div
+                class="w-10 h-10 rounded-full border border-gold/30 flex items-center justify-center mx-auto mb-6 text-gold text-sm">
+                ♥
+            </div>
+            <h2 class="font-serif text-4xl md:text-5xl leading-tight mb-5">
+                16 months down,<br /><span class="italic">forever to go.</span>
+            </h2>
+            <p class="font-script text-xl md:text-2xl text-white/75 leading-relaxed mb-8">
+                Thank you for being my favorite part of every day. No matter how many pages our story has, I will always
+                choose to write the next one with you.
+            </p>
+            <a href="#hero"
+                class="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-gold text-night text-[10px] font-semibold tracking-[0.2em] uppercase hover:bg-[#e5b352] transition-colors mb-10">
+                Read This Again ♡
+            </a>
+            <p class="text-[9px] tracking-[0.25em] uppercase text-white/35">
+                Made by hand, for Kan · 05.07.2025
+            </p>
+        </div>
+    </footer>
+
+    <!-- LOVE LETTER MODAL -->
+    <div id="letterModal"
+        class="modal-backdrop fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+            class="modal-panel relative bg-cream rounded-2xl max-w-lg w-full p-8 md:p-10 shadow-2xl border border-[#eadfd2]">
+            <button onclick="closeModal('letterModal')"
+                class="absolute top-4 right-5 text-[#8b735b] hover:text-[#2c2520] text-xl">&times;</button>
+            <p id="letterModalDate" class="text-[10px] tracking-[0.25em] uppercase text-gold mb-2"></p>
+            <h3 id="letterModalTitle" class="font-serif text-3xl text-[#2c2520] mb-5"></h3>
+            <div id="letterModalBody" class="font-script text-xl md:text-2xl text-[#4a3f37] leading-relaxed space-y-4">
+            </div>
+        </div>
+    </div>
+
+    <!-- GALLERY LIGHTBOX MODAL -->
+    <div id="galleryModal"
+        class="modal-backdrop fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="modal-panel relative bg-white p-3 pb-10 rounded-lg max-w-md w-full shadow-2xl">
+            <button onclick="closeModal('galleryModal')"
+                class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-cream text-[#2c2520] shadow-md flex items-center justify-center hover:scale-105 transition-transform">&times;</button>
+            <img id="galleryModalImg" src="" alt="" class="w-full h-80 object-cover rounded-sm mb-4" />
+            <p id="galleryModalCaption" class="font-script text-2xl text-center text-[#4a3f37]"></p>
+        </div>
+    </div>
+
+    <!-- 16 REASONS POP-UP MODAL -->
+    <div id="reasonModal"
+        class="modal-backdrop fixed inset-0 z-50 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+            class="modal-panel relative bg-cream rounded-2xl max-w-sm w-full p-8 text-center shadow-2xl border border-[#eadfd2]">
+            <button onclick="closeModal('reasonModal')"
+                class="absolute top-4 right-5 text-[#8b735b] hover:text-[#2c2520] text-lg">&times;</button>
+            <div
+                class="w-10 h-10 rounded-full bg-terracotta/15 text-terracotta flex items-center justify-center mx-auto mb-4 text-sm">
+                ♥
+            </div>
+            <p id="reasonModalNum" class="text-[9px] tracking-[0.28em] uppercase text-[#8b735b] mb-4">Reason No. 01</p>
+            <p id="reasonModalText" class="font-script text-2xl text-[#2c2520] leading-relaxed mb-6"></p>
+            <div class="w-10 h-px bg-gold/40 mx-auto mb-5"></div>
+            <button onclick="closeModal('reasonModal')"
+                class="text-[10px] tracking-[0.22em] uppercase text-[#8b735b] hover:text-gold transition-colors">
+                Keep It ♡
+            </button>
+        </div>
+    </div>
+
+    <!-- SECRET SURPRISE MODAL -->
+    <div id="secretModal"
+        class="modal-backdrop fixed inset-0 z-50 bg-black/65 backdrop-blur-sm flex items-center justify-center p-4">
+        <div
+            class="modal-panel relative bg-cream rounded-2xl max-w-md w-full p-8 md:p-10 text-center shadow-2xl border border-[#eadfd2]">
+            <button onclick="closeModal('secretModal')"
+                class="absolute top-4 right-5 text-[#8b735b] hover:text-[#2c2520] text-lg">&times;</button>
+            <div class="w-10 h-10 rounded-full bg-gold/15 text-gold flex items-center justify-center mx-auto mb-4">✦
+            </div>
+            <h3 class="font-serif text-3xl text-[#2c2520] mb-5">You found it.</h3>
+            <div class="font-script text-xl md:text-2xl text-[#4a3f37] leading-relaxed space-y-4 mb-6">
+                <p>There is something I have never said out loud properly: before you, I did not know I was lonely. I
+                    just thought that was what being a person felt like.</p>
+                <p>You changed the weather in me, Kan. You made the ordinary world glow at the edges — the bus rides,
+                    the waiting rooms, the boring afternoons. All of it.</p>
+                <p>Thank you for finding this. Thank you for finding me.</p>
+            </div>
+            <p class="text-[9px] tracking-[0.28em] uppercase text-[#9c8977]">Only you were meant to find this</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. STARFIELD GENERATOR
+        function createStarfield(containerId, starCount, shootingCount) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.setProperty('--duration', `${Math.random() * 3 + 2.5}s`);
+                star.style.setProperty('--delay', `${Math.random() * 4}s`);
+                star.style.setProperty('--opacity', `${Math.random() * 0.65 + 0.25}`);
+                container.appendChild(star);
+            }
+            for (let i = 0; i < shootingCount; i++) {
+                const shoot = document.createElement('div');
+                shoot.className = 'shooting-star';
+                shoot.style.top = `${Math.random() * 45 + 5}%`;
+                shoot.style.left = `${Math.random() * 60 + 30}%`;
+                shoot.style.setProperty('--delay', `${i * 3.5 + 1.5}s`);
+                container.appendChild(shoot);
+            }
+        }
+
+        createStarfield('heroStarfield', 110, 2);
+        createStarfield('secretStarfield', 85, 2);
+        createStarfield('footerStarfield', 135, 3);
+
+        // 2. LIVE COUNTDOWN (Since July 5, 2025)
+        const startDate = new Date('2025-07-05T00:00:00');
+        function updateCountdown() {
+            const now = new Date();
+            let years = now.getFullYear() - startDate.getFullYear();
+            let months = now.getMonth() - startDate.getMonth();
+            let days = now.getDate() - startDate.getDate();
+
+            if (days < 0) {
+                months--;
+                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+                days += prevMonth.getDate();
+            }
+            if (months < 0) {
+                years--;
+                months += 12;
+            }
+
+            const hours = String(now.getHours()).padStart(2, '0');
+            const mins = String(now.getMinutes()).padStart(2, '0');
+            const secs = String(now.getSeconds()).padStart(2, '0');
+
+            document.getElementById('cd-years').textContent = Math.max(0, years);
+            document.getElementById('cd-months').textContent = Math.max(0, months);
+            document.getElementById('cd-days').textContent = Math.max(0, days);
+            document.getElementById('cd-hours').textContent = hours;
+            document.getElementById('cd-mins').textContent = mins;
+            document.getElementById('cd-secs').textContent = secs;
+        }
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+        // 3. TIMELINE DATA & INLINE EXPAND
+        const memories = [
+            {
+                date: '02 · 05 · 2025',
+                title: 'အရာအားလုံးစတင်တဲ့နေ့',
+                subtitle: 'You were stuck on a problem. I offered to help.',
+                caption: 'where it started',
+                img: 'Start.jpg',
+                body: 'ကျောင်းကိုလာပြီး ပထမဆုံးပြန်တွေ့တဲ့နေ့လေးပေါ့ office က အလုပ်က css error လေးကို အတူတူဖြေရှင်းခဲ့ကြတဲ့နေ့လေး'
+            },
+            {
+                date: '06 · 07 · 2025',
+                title: 'Our first date',
+                subtitle: 'First Movie Date',
+                caption: 'the dark, and you',
+                img: 'Kan and Cody 12.jpg',
+                body: 'အဲ့နေ့မတိုင်ခင်ရှေ့တစ်ရက်က Ocean little boss မှာစားကြပြီးအပြန်ကားပေါ်မှာအာဘွားလေးပေးခဲ့တာ ဟဲဟဲ ဒီနေ့ကြတော့ movie date လေးပေါ့ နှုတ်ခမ်းနီ ဘယ်လိုအရသာလေးလဲသိချင်တယ်ဆိုပြီး နမ်းခဲ့ကြတာ 🩵'
+            },
+            {
+                date: '09 · 07 · 2025',
+                title: 'Officially us',
+                subtitle: 'A month later, we accepted each other',
+                caption: 'pinky promise',
+                img: 'Kand.jpg',
+                body: 'Discord မှာစကားတွေအများကြီးပြောရင်း နှစ်ယောက်လုံးရဲ့ emotion နဲ့ feeling တွေကို ထုတ်ပြောခဲ့ကြတယ်'
+            },
+            {
+                date: '09 · 08 · 2025',
+                title: 'Our first monthsary',
+                subtitle: 'A place with only 2 of us',
+                caption: 'one month, one candle',
+                img: 'Kan and Cody 1.jpg',
+                body: '2 ယောက်တည်းရှိတဲ့ နေရာလေးတစ်ခုပေါ့ ပြီးတော့ fufu မှာ hotpot သွားစားခဲ့ကြတယ်'
+            },
+            {
+                date: '09 · 07 · 2026',
+                title: 'One whole year',
+                subtitle: '365 days of you. Still not enough.',
+                caption: 'one year of us',
+                img: 'Me and u.jpg',
+                body: 'A full lap around the sun together. Four seasons, hundreds of late-night calls, and more inside jokes than anyone else could ever understand. You became my favorite habit and my safest place.'
+            },
+            {
+                date: '09 · 11 · 2026',
+                title: 'Sixteen months',
+                subtitle: 'The page we have not lived yet.',
+                caption: 'still writing...',
+                img: '16.jpg',
+                body: 'ဘာလိုလိုနဲ့ ၁ နှစ်နဲ့ ၄ လတောင်ရှိပြီ အနာဂတ်မှာဘာတွေဖြစ်လာမလဲ မသိသေးပေမယ့် အနားမှာလူချင်းမနီးစပ်ရင်တောင် စိတ်ချင်းနီးစပ်နေမယ် ချစ်တယ်🩵'
+            }
+        ];
+
+        const timelineEl = document.getElementById('timelineContainer');
+        memories.forEach((m, idx) => {
+            const isEven = idx % 2 === 0;
+            const rot = isEven ? '-rotate-2' : 'rotate-2';
+            const item = document.createElement('div');
+            item.className = `relative grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-14 items-center reveal`;
+            item.innerHTML = `
+        <div class="${isEven ? 'md:order-1' : 'md:order-2'} flex justify-center">
+          <div onclick="toggleMemory(${idx})" class="polaroid ${rot} cursor-pointer max-w-[320px] w-full">
+            <img src="${m.img}" alt="${m.title}" class="w-full h-56 object-cover mb-3" />
+            <p class="font-script text-lg text-[#6e6054] pl-1">${m.caption}</p>
+          </div>
+        </div>
+        <div class="${isEven ? 'md:order-2 md:pl-6' : 'md:order-1 md:pr-6 md:text-right'} relative">
+          <span class="hidden md:block absolute top-3 ${isEven ? '-left-[34px]' : '-right-[34px]'} w-2.5 h-2.5 rounded-full bg-gold ring-4 ring-cream"></span>
+          <p class="text-[10px] tracking-[0.25em] text-gold mb-1.5">${m.date}</p>
+          <h3 class="font-serif text-2xl md:text-3xl text-[#2c2520] mb-1">${m.title}</h3>
+          <p class="font-script text-xl text-[#8b735b] mb-3">${m.subtitle}</p>
+          <div id="mem-body-${idx}" class="memory-body">
+            <div>
+              <p class="text-xs md:text-sm text-[#6b5e53] leading-relaxed pb-4">${m.body}</p>
+            </div>
+          </div>
+          <button id="mem-btn-${idx}" onclick="toggleMemory(${idx})" class="text-[10px] tracking-[0.22em] uppercase text-[#9c8977] hover:text-gold transition-colors">
+            Open This Memory +
+          </button>
+        </div>
+      `;
+            timelineEl.appendChild(item);
+        });
+
+        function toggleMemory(idx) {
+            const body = document.getElementById(`mem-body-${idx}`);
+            const btn = document.getElementById(`mem-btn-${idx}`);
+            const isOpen = body.classList.toggle('open');
+            btn.textContent = isOpen ? 'Close This Page ×' : 'Open This Memory +';
+        }
+
+        // 4. LOVE LETTERS
+        const letters = [
+            {
+                stamp: '01.14',
+                title: 'Why I Love You',
+                teaser: 'I have tried to write this a hundred times...',
+                paragraphs: [
+                    'ဒါကို ရေးဖို့ ကိုယ် အကြိမ်ပေါင်း ရာနဲ့ချီပြီး ကြိုးစားခဲ့ဖူးတယ်...ချစ်တာမှာ ပွင့်ပွင့်လင်းလင်းပြောရရင် အများကြီးပဲပြောလိုတောင်မကုန်ပါဘူး တကယ့် reason က ဘေဘီကိုယ်တိုင်ကိုက ဘေဘီဖြစ်နေလိုပါပဲ'
+                ]
+            },
+            {
+                stamp: '03.22',
+                title: 'Things I Appreciate About You',
+                teaser: 'Thank you for the things no one claps for...',
+                paragraphs: [
+                    'ဘယ်သူ့ဆီကမှ ချီးကျူးဂုဏ်ပြုသံ မရတဲ့ အသေးအမွှားလေးတွေအတွက် ကျေးဇူးတင်ပါတယ်... ကိုယ့်ရဲ့ အဆင်မပြေတဲ့နေ့တွေမှာ သည်းခံပေးတာ၊ သတိတရနဲ့ လှမ်းပို့ပေးတဲ့ မက်ဆေ့ခ်ျလေးတွေအတွက်၊ ပြီးတော့ ကိုယ့်အနေနဲ့ ဘယ်တော့မှ ဟန်ဆောင်နေစရာမလိုဘဲ အေးချမ်းရတယ်လို့ ခံစားရစေတာတွေအတွက် ကျေးဇူးတင်ပါတယ်။ ဘေဘီက အသေးအမွှားလေးတွေအထိ သတိထားတတ်တယ်'
+                ]
+            },
+            {
+                stamp: '05.08',
+                title: 'My Favorite Memories',
+                teaser: 'Not the big ones — the ones that look like nothing...',
+                paragraphs: [
+                    'နေ့ရက်တိုင်းကတော့ memories တွေပါပဲ အပြင်မှာလူချင်းမတွေ့ရရင်တောင် ဖုန်းနဲ့စကားပြောရရင်တောင် ကိုယ့်အတွက် memories ပါပဲ မမေ့နိုင်ပဲအမှတ်ရစရာနေ့ တစ်နေ့ရှိပါတယ် ကိုယ်တို ၂ ယောက်လက်စွပ်တူတူသွားလုပ်ပြီးဝတ်တဲ့နေ့ကပါ'
+                ]
+            },
+            {
+                stamp: '07.01',
+                title: 'A Letter for Your Future Self',
+                teaser: 'Dear future Kan...',
+                paragraphs: [
+                    'Dear future Kan (My babe), I hope you are still smiling the exact same way, and I hope I am still right beside you, cheering you on.',
+                    'Whatever season we are in when you read this again, know that I am still just as proud of you as I am today.'
+                ]
+            }
+        ];
+
+        const lettersGrid = document.getElementById('lettersGrid');
+        letters.forEach((l, idx) => {
+            const card = document.createElement('div');
+            card.className = 'text-center cursor-pointer group';
+            card.onclick = () => openLetter(idx);
+            card.innerHTML = `
+        <div class="envelope-card rounded-xl h-44 flex items-center justify-center shadow-sm border border-[#e7d4c3] mb-4">
+          <div class="envelope-flap"></div>
+          <span class="absolute top-3 right-3 text-[9px] tracking-widest text-[#9c816b] border border-[#d9c1ae] rounded-full px-2 py-0.5 bg-white/40">${l.stamp}</span>
+          <div class="relative z-10 mt-4 w-9 h-9 rounded-full bg-terracotta shadow-md flex items-center justify-center text-white text-xs group-hover:scale-110 transition-transform">
+            ♥
+          </div>
+        </div>
+        <h4 class="font-serif text-lg text-[#2c2520] mb-1">${l.title}</h4>
+        <p class="font-script text-base text-[#8b735b]">${l.teaser}</p>
+      `;
+            lettersGrid.appendChild(card);
+        });
+
+        function openLetter(idx) {
+            const l = letters[idx];
+            document.getElementById('letterModalDate').textContent = `Stamp · ${l.stamp}`;
+            document.getElementById('letterModalTitle').textContent = l.title;
+            document.getElementById('letterModalBody').innerHTML = l.paragraphs.map(p => `<p>${p}</p>`).join('');
+            openModal('letterModal');
+        }
+
+        // 5. GALLERY
+        const photos = [
+            { img: '17.jpg', cap: 'July, 2025' },
+            { img: 'Kan and Cody 3.jpg', cap: 'August, 2025' },
+            { img: 'Kan and Cody 2.jpg', cap: 'September, 2025' },
+            { img: 'Kan and Cody 4.jpg', cap: 'October, 2025' },
+            { img: 'Kan and Cody 5.jpg', cap: 'November, 2025' },
+            { img: 'Kan and Cody 6.jpg', cap: 'December, 2025' },
+            { img: 'Kan and Cody 7.jpg', cap: 'January, 2026' },
+            { img: 'Kan and Cody 8.jpg', cap: 'February, 2026' },
+            { img: 'Kan and Cody 15.jpg', cap: 'March, 2026' },
+            { img: 'Kan and Cody 14.jpg', cap: 'April, 2026' },
+            { img: 'Kan and Cody 16.jpg', cap: 'May, 2026' },
+            { img: 'Kan and Cody 17.jpg', cap: 'June, 2026' }
+        ];
+
+        const galleryGrid = document.getElementById('galleryGrid');
+        photos.forEach((p, idx) => {
+            const rot = idx % 3 === 0 ? '-rotate-2' : idx % 3 === 1 ? 'rotate-1' : '-rotate-1';
+            const card = document.createElement('div');
+            card.className = `polaroid ${rot} cursor-pointer`;
+            card.onclick = () => {
+                document.getElementById('galleryModalImg').src = p.img;
+                document.getElementById('galleryModalCaption').textContent = p.cap;
+                openModal('galleryModal');
+            };
+            card.innerHTML = `
+        <img src="${p.img}" alt="${p.cap}" class="w-full h-36 md:h-44 object-cover mb-2.5" />
+        <p class="font-script text-sm md:text-base text-[#6e6054] truncate">${p.cap}</p>
+      `;
+            galleryGrid.appendChild(card);
+        });
+
+        // 6. 16 REASONS I LOVE YOU
+        const reasons = [
+            'The way you laugh before the joke is even finished.',
+            'How you always remember the tiny details I mention in passing.',
+            'Your sleepy voice on late-night calls.',
+            'The way you look at me when you think I am not noticing.',
+            'How safe and calm everything feels when you are around.',
+            'Your kindness to people even when you are tired.',
+            'The way you get excited about your favorite little things.',
+            'How you never let me go to sleep feeling alone.',
+            'Your warm hands on cold evenings.',
+            'The way you make ordinary errands feel like a date.',
+            'How hard you try, even on the days that feel heavy.',
+            'Your honesty, even when it is quiet and gentle.',
+            'The way you say my name.',
+            'How you turn bad days around with just one message.',
+            'That you chose me, and keep choosing me.',
+            'Simply because you are you, Kan.'
+        ];
+
+        const openedReasons = new Set();
+        const heartsGrid = document.getElementById('heartsGrid');
+        reasons.forEach((text, i) => {
+            const num = String(i + 1).padStart(2, '0');
+            const offset = i % 2 === 1 ? 'translate-y-2' : '-translate-y-1';
+            const btn = document.createElement('button');
+            btn.id = `heart-btn-${i}`;
+            btn.className = `relative group flex items-center justify-center w-12 h-12 ${offset} transition-transform duration-300 hover:scale-115`;
+            btn.onclick = () => {
+                openedReasons.add(i);
+                updateReasonsUI(i, num, text);
+            };
+            btn.innerHTML = `
+        <svg class="w-10 h-10 text-terracotta/55 group-hover:text-terracotta transition-colors" fill="none" stroke="currentColor" stroke-width="1.4" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+        </svg>
+        <span class="absolute text-[9px] font-medium text-[#7a6d62] group-hover:text-[#2c2520]">${i + 1}</span>
+      `;
+            heartsGrid.appendChild(btn);
+        });
+
+        function updateReasonsUI(idx, num, text) {
+            const btn = document.getElementById(`heart-btn-${idx}`);
+            const svg = btn.querySelector('svg');
+            const span = btn.querySelector('span');
+            svg.setAttribute('fill', '#d9a441');
+            svg.classList.remove('text-terracotta/55');
+            svg.classList.add('text-gold', 'drop-shadow-[0_0_10px_rgba(217,164,65,0.6)]');
+            span.classList.add('text-white');
+
+            const count = openedReasons.size;
+            document.getElementById('reasonsCounter').textContent = `${count} / 16`;
+            document.getElementById('reasonsProgressBar').style.width = `${(count / 16) * 100}%`;
+
+            document.getElementById('reasonModalNum').textContent = `Reason No. ${num}`;
+            document.getElementById('reasonModalText').textContent = text;
+            openModal('reasonModal');
+        }
+
+        // 7. OUR FUTURE
+        const futureItems = [
+            { icon: '✈', title: "The places we'll go", desc: 'A plane ride with your head on my shoulder, a city neither of us has seen, and you complaining about all the walking.' },
+            { icon: '⌂', title: "The home we'll build", desc: 'Something small that smells like whatever you are cooking. Too many blankets. A shelf just for the things we could never throw away.' },
+            { icon: '⊡', title: "The photos we'll take", desc: 'Every one, unflattering ones, the ones you will try to delete and that I will save anyway.' },
+            { icon: '☕', title: 'The mornings', desc: 'Coffee you will steal from my cup. Your hair everywhere. The good kind of quiet.' },
+            { icon: '✦', title: 'The adventures', desc: 'Getting lost on purpose somewhere with terrible reception, and not minding one bit.' },
+            { icon: '♫', title: 'The songs', desc: 'The bad karaoke ones without either of us ever checking the lyrics.' }
+        ];
+
+        const futureGrid = document.getElementById('futureGrid');
+        futureItems.forEach(f => {
+            const card = document.createElement('div');
+            card.className = 'rounded-2xl bg-white/75 border border-[#eadfd2] p-6 shadow-sm hover:shadow-md transition-shadow';
+            card.innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-gold/15 text-gold flex items-center justify-center text-xs mb-4">${f.icon}</div>
+        <h4 class="font-serif text-xl text-[#2c2520] mb-2">${f.title}</h4>
+        <p class="font-script text-lg text-[#7a6d62] leading-snug">${f.desc}</p>
+      `;
+            futureGrid.appendChild(card);
+        });
+
+        // 8. MODAL HELPERS
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal-backdrop').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        });
+
+        document.getElementById('secretStarBtn').addEventListener('click', () => openModal('secretModal'));
+        document.getElementById('openSecretBtn').addEventListener('click', () => openModal('secretModal'));
+
+        // 9. SCROLL REVEAL
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.12 });
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // 10. AMBIENT WEB AUDIO SYNTH
+        let audioCtx = null;
+        let isPlaying = false;
+        let osc1, osc2, gainNode;
+
+        document.getElementById('audioToggle').addEventListener('click', () => {
+            const playIcon = document.getElementById('playIcon');
+            const pauseIcon = document.getElementById('pauseIcon');
+
+            if (!isPlaying) {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                gainNode = audioCtx.createGain();
+                gainNode.gain.setValueAtTime(0.001, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.04, audioCtx.currentTime + 1.5);
+
+                osc1 = audioCtx.createOscillator();
+                osc2 = audioCtx.createOscillator();
+                osc1.type = 'sine';
+                osc2.type = 'triangle';
+                osc1.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc2.frequency.setValueAtTime(329.63, audioCtx.currentTime);
+
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+
+                osc1.start();
+                osc2.start();
+                isPlaying = true;
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            } else {
+                gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+                setTimeout(() => {
+                    osc1.stop();
+                    osc2.stop();
+                }, 550);
+                isPlaying = false;
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>
